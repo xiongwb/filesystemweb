@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>xwb文件系统</title>
+    <link rel="stylesheet" type="text/css" href="./webuploader.css" />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <link rel="stylesheet" type="text/css" href="./bootstrap.min.css" />
+    <style>
+        .imgBox{
+            height: 400px;
+            width: 400px;
+            float: left;
+            margin: 10px;
+            padding:5px;
+            border:1px solid #e2e2e2;
+            white-space:normal;
+            cursor:pointer;
+            text-align: center;
+            vertical-align:middle;
+        }
+        .img{
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">上传文件</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab" onclick="list()">文件总览</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="home">
+                <div id="wrapper">
+                    <div id="container">
+                        <!--头部，相册选择和格式选择-->
+
+                        <div id="uploader">
+                            <div class="queueList">
+                                <div id="dndArea" class="placeholder">
+                                    <div id="filePicker"></div>
+                                    <p>或将照片拖到这里，单次最多可选300张</p>
+                                </div>
+                            </div>
+                            <div class="statusBar" style="display:none;">
+                                <div class="progress">
+                                    <span class="text">0%</span>
+                                    <span class="percentage"></span>
+                                </div><div class="info"></div>
+                                <div class="btns">
+                                    <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="profile">
+                <div id="fileBox">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var ipport = window.location.protocol + "//" + window.location.host + window.location.port;
+
+        function list(){
+            $.get("/fileViewUtil/list", function(data){
+                if(data != null && data.length > 0){
+                    var content = "";
+                    for(var i in data){
+                        var path = data[i];
+                        var extend = path.substring(path.lastIndexOf('.') + 1, path.length);
+                        var c = "";
+                        if(extend.toLowerCase() == "jpg" || extend.toLowerCase() == "png"){
+                            c = "<img class='img' src='/downloadUtil/download?path="+path+"' />"
+                        }else{
+                            c = "<br/><br/><br/><br/><br/><br/>非图片文件，不可预览<br/>" + path;
+                        }
+                        var downloadPath = ipport + "/downloadUtil/download?path=" + path;
+                        var cp = "<input id='"+i+"' value='"+downloadPath+"' style='opacity: 0;position: absolute;' type='text'>";
+                        content += "<div class='imgBox' onclick='copy(&quot;"+i+"&quot;)'>" + c + cp +"</div>";
+                    }
+                    $("#fileBox").html(content);
+                }
+            }, "json")
+        }
+
+        function copy(id){
+            layer.msg("路径已复制");
+            var Url2=document.getElementById(id);
+            Url2.select(); // 选择对象
+            document.execCommand("Copy");
+        }
+    </script>
+    
+    <script type="text/javascript" src="./jquery.js"></script>
+    <script type="text/javascript" src="./bootstrap.min.js"></script>
+    <script type="text/javascript" src="./webuploader.js"></script>
+    <script type="text/javascript" src="./upload.js"></script>
+    <script type="text/javascript" src="./layer/layer.js"></script>
+</body>
+</html>
